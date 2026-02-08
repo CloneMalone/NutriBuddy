@@ -35,8 +35,10 @@ Thumbs.db
 *.sublime-workspace
 *.sublime-project
 
-# Ignore the repomix output XML
+# Ignore singular files
 /repomix-output.xml
+/education.md
+/frontend-example.md
 
 # Ignore coverage reports
 coverage/
