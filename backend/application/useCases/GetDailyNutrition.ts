@@ -1,19 +1,19 @@
 // Import the repository and entity we need to fetch nutrition data
-import { NutritionEntryRepository } from "../../domain/repositories/NutritionEntryRepository";
-import { NutritionEntry } from "../../domain/entities/NutritionEntry";
+import { NutritionLogRepository } from "../../domain/repositories/NutritionLogRepository";
+import { NutritionLog } from "../../domain/entities/NutritionLog";
 
 export class GetDailyNutrition {
-    private readonly nutritionEntryRepository: NutritionEntryRepository;
+    private readonly nutritionLogRepository: NutritionLogRepository;
 
-    constructor(nutritionEntryRepository: NutritionEntryRepository) {
-        this.nutritionEntryRepository = nutritionEntryRepository;
+    constructor(nutritionLogRepository: NutritionLogRepository) {
+        this.nutritionLogRepository = nutritionLogRepository;
     }
 
     async execute(input: {
         userId: string;
         date: Date;
-    }): Promise<NutritionEntry[]> {
-        return this.nutritionEntryRepository.findByUserAndDate(
+    }): Promise<NutritionLog[]> {
+        return this.nutritionLogRepository.findByUserAndDate(
             input.userId,
             input.date
         );
