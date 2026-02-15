@@ -2,7 +2,7 @@
 import { NutritionLogRepository } from "../../domain/repositories/NutritionLogRepository";
 import { NutritionLog } from "../../domain/entities/NutritionLog";
 
-export class GetDailyNutrition {
+export class GetNutritionLogsByDate {
     private readonly nutritionLogRepository: NutritionLogRepository;
 
     constructor(nutritionLogRepository: NutritionLogRepository) {

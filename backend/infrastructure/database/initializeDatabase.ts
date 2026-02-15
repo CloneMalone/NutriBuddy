@@ -31,5 +31,15 @@ export async function initializeDatabase(db: DatabaseClient): Promise<void> {
         );
     `);
 
+    // Sessions table for server-side sessions
+    await db.run(`
+        CREATE TABLE IF NOT EXISTS sessions (
+            id TEXT PRIMARY KEY,
+            user_id TEXT NOT NULL,
+            expires_at TEXT NOT NULL,
+            data TEXT,
+            FOREIGN KEY(user_id) REFERENCES users(id)
+        );
+    `);
     console.log("Database initialized.");
 }

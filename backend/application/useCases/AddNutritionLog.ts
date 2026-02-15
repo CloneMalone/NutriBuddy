@@ -13,13 +13,16 @@ export class AddNutritionLog {
     async execute(input: {
         id: string;
         userId: string;
-        nutritionEntry: NutritionEntry;
+        calories: number;
+        description: string;
         date: Date;
     }): Promise<void> {
+        const entry = new NutritionEntry(input.calories, input.description);
+
         const log = new NutritionLog(
             input.id,
             input.userId,
-            input.nutritionEntry,
+            entry,
             input.date
         );
 

@@ -39,6 +39,7 @@ Thumbs.db
 /repomix-output.xml
 /education.md
 /frontend-example.md
+/instructions.md
 
 # Ignore coverage reports
 coverage/

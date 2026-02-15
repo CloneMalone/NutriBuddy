@@ -6,11 +6,15 @@ import { RegisterUser } from "../../../application/useCases/RegisterUser";
 import { LoginUser } from "../../../application/useCases/LoginUser";
 import { randomUUID } from "crypto";
 import { DomainError } from "../../../domain/DomainError";
+import { SessionRepository } from "../../../domain/repositories/SessionRepository";
 
 export class AuthController {
     constructor(
         private readonly registerUser: RegisterUser,
-        private readonly loginUser: LoginUser
+        private readonly loginUser: LoginUser,
+        private readonly sessionRepository: SessionRepository,
+        private readonly sessionCookieName: string,
+        private readonly sessionCookieOptions: Record<string, unknown>
     ) {}
 
     register = async (req: Request, res: Response) => {
@@ -43,10 +47,15 @@ export class AuthController {
 
             const user = await this.loginUser.execute({ email, password });
 
-            return res.status(200).json({
-                message: "Login successful",
-                userId: user.id
-            });
+            // Create server-side session and set cookie
+            const sessionId = randomUUID();
+            const expiresAt = new Date(Date.now() + (this.sessionCookieOptions as any).maxAge);
+
+            await this.sessionRepository.create(sessionId, user.id, expiresAt);
+
+            res.cookie(this.sessionCookieName, sessionId, this.sessionCookieOptions as any);
+
+            return res.status(200).json({ message: "Login successful" });
         } catch (error) {
             if (error instanceof DomainError) {
                 return res.status(401).json({ error: error.message });
