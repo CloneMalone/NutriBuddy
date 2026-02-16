@@ -98,27 +98,6 @@ Dependencies only point **inward** toward the domain layer. The domain layer kno
 | POST | `/api/nutrition` | Add nutrition entry | Yes |
 | GET | `/api/nutrition?date=YYYY-MM-DD` | Get entries for date | Yes |
 
-## Getting Started
-
-### Prerequisites
-- Node.js 18+
-- npm or yarn
-
-### Installation
-
-```bash
-# Navigate to backend directory
-cd backend
-
-# Install dependencies
-npm install
-
-# Start development server
-npm run dev
-```
-
-The server will start on `http://localhost:5000`.
-
 ### Database
 
 SQLite database is automatically initialized on first run with the following tables:
@@ -135,7 +114,3 @@ SQLite database is automatically initialized on first run with the following tab
 | `NutritionLogRepository` | `SQLiteNutritionLogRepository` | Nutrition data |
 | `PasswordHasher` | `BcryptPasswordHasher` | Password hashing |
 | `DatabaseClient` | `sqliteConnection` | Database operations |
-
-## Documentation
-
-For a detailed visual guide of how data flows through the architecture, see [clean-architecture-trace.html](clean-architecture-trace.html).
