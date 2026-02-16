@@ -1,13 +1,23 @@
-// This file contains a function to initialize the database schema. 
-// It creates the necessary tables for users and nutrition logs if they don't 
-// already exist. This is typically called when the application starts to 
-// ensure the database is ready for use.
+/**
+ * Database Initialization - Creates the database tables if they don't exist.
+ * 
+ * This function is called when the server starts (in main.ts).
+ * It uses "CREATE TABLE IF NOT EXISTS" so it's safe to run multiple times -
+ * if the tables already exist, nothing happens.
+ */
 
+// Import the database client interface
 import { DatabaseClient } from "./DatabaseClient";
 
+/**
+ * Initialize all database tables.
+ * 
+ * @param db - The database client to use for running queries
+ */
 export async function initializeDatabase(db: DatabaseClient): Promise<void> {
 
-    // Users table
+    // Create the users table
+    // Stores registered user accounts
     await db.run(`
         CREATE TABLE IF NOT EXISTS users (
             id TEXT PRIMARY KEY,
@@ -19,7 +29,8 @@ export async function initializeDatabase(db: DatabaseClient): Promise<void> {
         );
     `);
 
-    // Nutrition logs table
+    // Create the nutrition_logs table
+    // Stores food entries logged by users
     await db.run(`
         CREATE TABLE IF NOT EXISTS nutrition_logs (
             id TEXT PRIMARY KEY,
@@ -31,7 +42,8 @@ export async function initializeDatabase(db: DatabaseClient): Promise<void> {
         );
     `);
 
-    // Sessions table for server-side sessions
+    // Create the sessions table
+    // Stores login sessions for authentication
     await db.run(`
         CREATE TABLE IF NOT EXISTS sessions (
             id TEXT PRIMARY KEY,
@@ -41,5 +53,7 @@ export async function initializeDatabase(db: DatabaseClient): Promise<void> {
             FOREIGN KEY(user_id) REFERENCES users(id)
         );
     `);
+    
+    // Log success message
     console.log("Database initialized.");
 }

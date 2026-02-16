@@ -40,6 +40,7 @@ Thumbs.db
 /education.md
 /frontend-example.md
 /instructions.md
+/clean-architecture-trace.html
 
 # Ignore coverage reports
 coverage/

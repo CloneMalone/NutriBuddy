@@ -1,18 +1,32 @@
-// This file implements the UserRepository interface using SQLite as the storage mechanism.
-// It uses the DatabaseClient interface to perform database operations, and maps
-// between the User entity and the database rows.
+/**
+ * SQLiteUserRepository - Concrete implementation of UserRepository using SQLite.
+ * 
+ * This class is the bridge between our domain entities and the SQLite database.
+ * It handles:
+ * - Converting User entities to database rows (for saving)
+ * - Converting database rows back to User entities (for reading)
+ * 
+ * IMPORTANT: The domain layer (entities, use cases) doesn't know this class exists!
+ * They only know about the UserRepository interface. This is the power of abstraction.
+ */
 
-// This is important because it allows us to keep our domain logic separate from the 
-// details of how we store data, and makes it easier to swap out the database 
-// implementation in the future if needed.
-
+// Import the interface we're implementing (defined in domain layer)
 import { UserRepository } from "../../domain/repositories/UserRepository";
+
+// Import domain entities and value objects
 import { User } from "../../domain/entities/User";
 import { UserEmail } from "../../domain/valueObjects/UserEmail";
 import { UserPassword } from "../../domain/valueObjects/UserPassword";
 import { UserCalorieBudget } from "../../domain/valueObjects/UserCalorieBudget";
+
+// Import the database client interface
 import { DatabaseClient } from "../database/DatabaseClient";
 
+/**
+ * Type definition for how user data looks in the database.
+ * Column names use snake_case (database convention),
+ * while our domain uses camelCase (JavaScript convention).
+ */
 interface UserRow {
     id: string;
     first_name: string;
@@ -23,9 +37,16 @@ interface UserRow {
 }
 
 export class SQLiteUserRepository implements UserRepository {
+    // Database client injected through constructor
     constructor(private readonly db: DatabaseClient) {}
 
+    /**
+     * Save a new user to the database.
+     * 
+     * @param user - The User entity to save
+     */
     async save(user: User): Promise<void> {
+        // Insert the user data, extracting primitive values from value objects
         await this.db.run(
             `
             INSERT INTO users (
@@ -41,14 +62,21 @@ export class SQLiteUserRepository implements UserRepository {
                 user.id,
                 user.firstName,
                 user.lastName,
-                user.email.value,
-                user.passwordHash.value,
-                user.calorieBudget.value
+                user.email.value,           // Extract string from UserEmail
+                user.passwordHash.value,    // Extract string from UserPassword  
+                user.calorieBudget.value    // Extract number from UserCalorieBudget
             ]
         );
     }
 
+    /**
+     * Find a user by their email address.
+     * 
+     * @param email - The email to search for (as a UserEmail value object)
+     * @returns The User if found, or null if not found
+     */
     async findByEmail(email: UserEmail): Promise<User | null> {
+        // Query the database for a matching email
         const row = await this.db.get<UserRow>(
             `
             SELECT * FROM users
@@ -57,12 +85,21 @@ export class SQLiteUserRepository implements UserRepository {
             [email.value]
         );
 
+        // Return null if no user found
         if (!row) return null;
 
+        // Convert database row to User entity
         return this.mapRowToUser(row);
     }
 
+    /**
+     * Find a user by their unique ID.
+     * 
+     * @param id - The user's UUID
+     * @returns The User if found, or null if not found
+     */
     async findById(id: string): Promise<User | null> {
+        // Query the database for a matching ID
         const row = await this.db.get<UserRow>(
             `
             SELECT * FROM users
@@ -71,19 +108,28 @@ export class SQLiteUserRepository implements UserRepository {
             [id]
         );
 
+        // Return null if no user found
         if (!row) return null;
 
+        // Convert database row to User entity
         return this.mapRowToUser(row);
     }
 
+    /**
+     * Convert a database row into a User entity.
+     * 
+     * This is where we reconstruct value objects from primitive database values.
+     * Since the values already passed validation when first saved,
+     * the value object constructors should not throw here.
+     */
     private mapRowToUser(row: UserRow): User {
         return new User(
             row.id,
             row.first_name,
             row.last_name,
-            new UserEmail(row.email),
-            new UserPassword(row.password_hash),
-            new UserCalorieBudget(row.calorie_budget)
+            new UserEmail(row.email),                    // Wrap email string in value object
+            new UserPassword(row.password_hash),         // Wrap hash string in value object
+            new UserCalorieBudget(row.calorie_budget)    // Wrap number in value object
         );
     }
 }

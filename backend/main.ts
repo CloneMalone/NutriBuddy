@@ -1,39 +1,98 @@
-// This is the entry point of our backend application. It sets up the Express server, 
-// initializes the database, and wires together all the components of our application. 
-// This is where we create instances of our repositories, services, use cases, and 
-// controllers, and connect them to the HTTP routes.
+/**
+ * main.ts - Application Entry Point (Composition Root)
+ * 
+ * This file bootstraps the entire backend application. It's called the "Composition Root"
+ * because this is where we compose (wire together) all the pieces of our application.
+ * 
+ * This is the ONLY place in the codebase that knows about all concrete implementations.
+ * Every other file works with interfaces/abstractions.
+ * 
+ * The bootstrap process:
+ * 1. Initialize the database (create tables if needed)
+ * 2. Create infrastructure implementations (repositories, services)
+ * 3. Create use cases with injected dependencies
+ * 4. Create controllers with injected use cases
+ * 5. Configure Express middleware and routes
+ * 6. Start the HTTP server
+ */
 
+// ============================================================================
+// IMPORTS - External Libraries
+// ============================================================================
 import express from "express";
 import cors from "cors";
+
+// ============================================================================
+// IMPORTS - Infrastructure Layer (Concrete Implementations)
+// ============================================================================
+
+// Database connection and initialization
 import { sqliteConnection } from "./infrastructure/database/sqliteConnection";
 import { initializeDatabase } from "./infrastructure/database/initializeDatabase";
+
+// Repository implementations (how we store data)
 import { SQLiteUserRepository } from "./infrastructure/repositories/SQLiteUserRepository";
+import { SQLiteSessionRepository } from "./infrastructure/repositories/SQLiteSessionRepository";
+import { SQLiteNutritionLogRepository } from "./infrastructure/repositories/SQLiteNutritionLogRepository";
+
+// Authentication infrastructure
 import { BcryptPasswordHasher } from "./infrastructure/auth/BcryptPasswordHasher";
+import { SESSION_COOKIE_NAME, sessionCookieOptions } from "./infrastructure/auth/cookieConfig";
+import { createSessionMiddleware } from "./infrastructure/auth/sessionMiddleware";
+
+// ============================================================================
+// IMPORTS - Application Layer (Use Cases)
+// ============================================================================
 import { RegisterUser } from "./application/useCases/RegisterUser";
 import { LoginUser } from "./application/useCases/LoginUser";
-import { AuthController } from "./interfaces/http/controllers/AuthController";
-import { createAuthRoutes } from "./interfaces/http/routes";
-import { SESSION_COOKIE_NAME, sessionCookieOptions } from "./infrastructure/auth/cookieConfig";
-import { SQLiteSessionRepository } from "./infrastructure/repositories/SQLiteSessionRepository";
-import { createSessionMiddleware } from "./infrastructure/auth/sessionMiddleware";
-import { SQLiteNutritionLogRepository } from "./infrastructure/repositories/SQLiteNutritionLogRepository";
 import { AddNutritionLog } from "./application/useCases/AddNutritionLog";
 import { GetNutritionLogsByDate } from "./application/useCases/GetNutritionLogsByDate";
-import { NutritionController } from "./interfaces/http/controllers/NutritionController";
-import { createNutritionRoutes } from "./interfaces/http/routes";
 
+// ============================================================================
+// IMPORTS - Interface Layer (Controllers & Routes)
+// ============================================================================
+import { AuthController } from "./interfaces/http/controllers/AuthController";
+import { NutritionController } from "./interfaces/http/controllers/NutritionController";
+import { createAuthRoutes, createNutritionRoutes } from "./interfaces/http/routes";
+
+// ============================================================================
+// BOOTSTRAP FUNCTION - Wires everything together
+// ============================================================================
 async function bootstrap() {
+    // ------------------------------------------------------------------------
+    // Step 1: Initialize the Database
+    // ------------------------------------------------------------------------
+    // Creates tables if they don't exist (users, sessions, nutrition_logs)
     await initializeDatabase(sqliteConnection);
 
+    // ------------------------------------------------------------------------
+    // Step 2: Create Infrastructure Layer (Concrete Implementations)
+    // ------------------------------------------------------------------------
+    
+    // Create repositories - these implement domain interfaces using SQLite
     const userRepository = new SQLiteUserRepository(sqliteConnection);
     const sessionRepository = new SQLiteSessionRepository(sqliteConnection);
-    const passwordHasher = new BcryptPasswordHasher();
-
     const nutritionLogRepository = new SQLiteNutritionLogRepository(sqliteConnection);
 
+    // Create services - the password hasher uses bcrypt
+    const passwordHasher = new BcryptPasswordHasher();
+
+    // ------------------------------------------------------------------------
+    // Step 3: Create Application Layer (Use Cases)
+    // ------------------------------------------------------------------------
+    // Use cases receive their dependencies through constructor injection
+    // They receive interfaces, not concrete implementations!
+    
     const registerUser = new RegisterUser(userRepository, passwordHasher);
     const loginUser = new LoginUser(userRepository, passwordHasher);
+    const addNutritionLog = new AddNutritionLog(nutritionLogRepository);
+    const getNutritionLogsByDate = new GetNutritionLogsByDate(nutritionLogRepository);
 
+    // ------------------------------------------------------------------------
+    // Step 4: Create Interface Layer (Controllers)
+    // ------------------------------------------------------------------------
+    // Controllers receive use cases through constructor injection
+    
     const authController = new AuthController(
         registerUser,
         loginUser,
@@ -42,13 +101,18 @@ async function bootstrap() {
         sessionCookieOptions
     );
 
-    const addNutritionLog = new AddNutritionLog(nutritionLogRepository);
-    const getNutritionLogsByDate = new GetNutritionLogsByDate(nutritionLogRepository);
-    const nutritionController = new NutritionController(addNutritionLog, getNutritionLogsByDate);
+    const nutritionController = new NutritionController(
+        addNutritionLog, 
+        getNutritionLogsByDate
+    );
 
+    // ------------------------------------------------------------------------
+    // Step 5: Configure Express Application
+    // ------------------------------------------------------------------------
     const app = express();
 
-    // CORS configuration to allow requests from the frontend
+    // CORS middleware - allows frontend (localhost:3000) to make requests
+    // credentials: true allows cookies to be sent cross-origin
     app.use(
         cors({
             origin: "http://localhost:3000",
@@ -56,15 +120,22 @@ async function bootstrap() {
         })
     );
 
+    // JSON body parser - converts request body to JavaScript object
     app.use(express.json());
 
-    // Session middleware attaches `req.userId` when a valid session cookie is present
+    // Session middleware - validates cookies and sets req.userId for authenticated users
     app.use(createSessionMiddleware(sessionRepository));
 
-    // Set up routes
+    // ------------------------------------------------------------------------
+    // Step 6: Register Routes
+    // ------------------------------------------------------------------------
+    // Mount route groups at their base paths
     app.use("/api/users", createAuthRoutes(authController));
     app.use("/api/nutrition", createNutritionRoutes(nutritionController));
 
+    // ------------------------------------------------------------------------
+    // Step 7: Start the Server
+    // ------------------------------------------------------------------------
     const PORT = 5000;
 
     app.listen(PORT, () => {
@@ -72,4 +143,5 @@ async function bootstrap() {
     });
 }
 
+// Run the bootstrap function to start the application
 bootstrap();
