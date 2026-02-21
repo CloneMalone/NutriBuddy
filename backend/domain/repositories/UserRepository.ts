@@ -12,7 +12,7 @@
 
 // Import the entity and value object this repository handles
 import { User } from "../entities/User";
-import { UserEmail } from "../valueObjects/UserEmail";
+import { UserEmailEntry } from "../valueObjects/UserEmailEntry";
 
 export interface UserRepository {
     // Save a new user to the database
@@ -20,7 +20,7 @@ export interface UserRepository {
     
     // Find a user by their email address (used for login and duplicate checking)
     // Returns null if no user exists with that email
-    findByEmail(email: UserEmail): Promise<User | null>;
+    findByEmail(email: UserEmailEntry): Promise<User | null>;
     
     // Find a user by their unique ID
     // Returns null if no user exists with that ID

@@ -15,8 +15,8 @@ import { UserRepository } from "../../domain/repositories/UserRepository";
 
 // Import domain entities and value objects
 import { User } from "../../domain/entities/User";
-import { UserEmail } from "../../domain/valueObjects/UserEmail";
-import { UserPassword } from "../../domain/valueObjects/UserPassword";
+import { UserEmailEntry } from "../../domain/valueObjects/UserEmailEntry";
+import { UserHashedPassword } from "../../domain/valueObjects/UserHashedPassword";
 import { UserCalorieBudget } from "../../domain/valueObjects/UserCalorieBudget";
 
 // Import the database client interface
@@ -62,8 +62,8 @@ export class SQLiteUserRepository implements UserRepository {
                 user.id,
                 user.firstName,
                 user.lastName,
-                user.email.value,           // Extract string from UserEmail
-                user.passwordHash.value,    // Extract string from UserPassword  
+                user.email.value,           // Extract string from UserEmailEntry
+                user.passwordHash.value,    // Extract string from UserHashedPassword  
                 user.calorieBudget.value    // Extract number from UserCalorieBudget
             ]
         );
@@ -72,10 +72,10 @@ export class SQLiteUserRepository implements UserRepository {
     /**
      * Find a user by their email address.
      * 
-     * @param email - The email to search for (as a UserEmail value object)
+     * @param email - The email to search for (as a UserEmailEntry value object)
      * @returns The User if found, or null if not found
      */
-    async findByEmail(email: UserEmail): Promise<User | null> {
+    async findByEmail(email: UserEmailEntry): Promise<User | null> {
         // Query the database for a matching email
         const row = await this.db.get<UserRow>(
             `
@@ -127,8 +127,8 @@ export class SQLiteUserRepository implements UserRepository {
             row.id,
             row.first_name,
             row.last_name,
-            new UserEmail(row.email),                    // Wrap email string in value object
-            new UserPassword(row.password_hash),         // Wrap hash string in value object
+            new UserEmailEntry(row.email),                // Wrap email string in value object
+            new UserHashedPassword(row.password_hash),   // Wrap hash string in value object
             new UserCalorieBudget(row.calorie_budget)    // Wrap number in value object
         );
     }

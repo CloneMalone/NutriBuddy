@@ -18,8 +18,9 @@ import { UserRepository } from "../../domain/repositories/UserRepository";
 
 // Import domain entities and value objects
 import { User } from "../../domain/entities/User";
-import { UserEmail } from "../../domain/valueObjects/UserEmail";
-import { UserPassword } from "../../domain/valueObjects/UserPassword";
+import { UserEmailEntry } from "../../domain/valueObjects/UserEmailEntry";
+import { UserHashedPassword } from "../../domain/valueObjects/UserHashedPassword";
+import { UserPasswordEntry } from "../../domain/valueObjects/UserPasswordEntry";
 import { UserCalorieBudget } from "../../domain/valueObjects/UserCalorieBudget";
 
 // Import service interface for password hashing
@@ -55,12 +56,14 @@ export class RegisterUser {
         lastName: string;
         email: string;
         password: string;
+        confirmPassword: string;
         calorieBudget: number;
     }): Promise<void> {
 
         // Step 1: Create validated value objects
         // These constructors will throw DomainError if validation fails
-        const email = new UserEmail(input.email);
+        const email = new UserEmailEntry(input.email);
+        const passwordEntry = new UserPasswordEntry(input.password, input.confirmPassword);
         const userCalorieBudget = new UserCalorieBudget(input.calorieBudget);
 
         // Step 2: Check if a user already exists with this email
@@ -69,10 +72,10 @@ export class RegisterUser {
             throw new DomainError("User with this email already exists");
         }
 
-        // Step 3: Hash the password using our password hasher service
-        // This converts "secret123" into something like "$2b$10$N9qo8uLOickgx..."
-        const hashedPassword = await this.passwordHasher.hash(input.password);
-        const userPassword = new UserPassword(hashedPassword);
+        // Step 3: Hash the validated password using our password hasher service
+        // This converts the plain-text password into something like "$2b$10$N9qo8uLOickgx..."
+        const hashedPassword = await this.passwordHasher.hash(passwordEntry.value);
+        const userPassword = new UserHashedPassword(hashedPassword);
 
         // Step 4: Create the User entity with all validated data
         const user = new User(

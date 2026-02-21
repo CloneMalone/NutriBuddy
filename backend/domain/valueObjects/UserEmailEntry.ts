@@ -1,11 +1,11 @@
 /**
- * UserEmail Value Object - Represents and validates an email address.
+ * UserEmailEntry Value Object - Represents and validates an email address.
  * 
  * Value Objects are small objects that hold a value and validate it.
  * They are IMMUTABLE (cannot be changed after creation).
- * Two UserEmail objects with the same value are considered equal.
+ * Two UserEmailEntry objects with the same value are considered equal.
  * 
- * By validating in the constructor, we guarantee that ANY UserEmail
+ * By validating in the constructor, we guarantee that ANY UserEmailEntry
  * object in our system contains a valid email. If validation fails,
  * an error is thrown and the object is never created.
  */
@@ -13,7 +13,7 @@
 // Import DomainError so we can throw meaningful business logic errors
 import { DomainError } from "../DomainError";
 
-export class UserEmail {
+export class UserEmailEntry {
     // The actual email string, stored after validation
     public readonly value: string;
 

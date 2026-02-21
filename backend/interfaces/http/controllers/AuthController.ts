@@ -53,7 +53,7 @@ export class AuthController {
     register = async (req: Request, res: Response) => {
         try {
             // Extract registration data from request body
-            const { firstName, lastName, email, password, calorieBudget } = req.body;
+            const { firstName, lastName, email, password, confirmPassword, calorieBudget } = req.body;
 
             // Call the use case with the registration data
             // Use case handles validation and business logic
@@ -63,6 +63,7 @@ export class AuthController {
                 lastName,
                 email,
                 password,
+                confirmPassword,
                 calorieBudget
             });
 
