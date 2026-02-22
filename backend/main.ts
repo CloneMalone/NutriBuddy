@@ -47,6 +47,7 @@ import { RegisterUser } from "./application/useCases/RegisterUser";
 import { LoginUser } from "./application/useCases/LoginUser";
 import { AddNutritionLog } from "./application/useCases/AddNutritionLog";
 import { GetNutritionLogsByDate } from "./application/useCases/GetNutritionLogsByDate";
+import { GetUserProfile } from "./application/useCases/GetUserProfile";
 
 // ============================================================================
 // IMPORTS - Interface Layer (Controllers & Routes)
@@ -85,6 +86,7 @@ async function bootstrap() {
     
     const registerUser = new RegisterUser(userRepository, passwordHasher);
     const loginUser = new LoginUser(userRepository, passwordHasher);
+    const getUserProfile = new GetUserProfile(userRepository);
     const addNutritionLog = new AddNutritionLog(nutritionLogRepository);
     const getNutritionLogsByDate = new GetNutritionLogsByDate(nutritionLogRepository);
 
@@ -96,6 +98,7 @@ async function bootstrap() {
     const authController = new AuthController(
         registerUser,
         loginUser,
+        getUserProfile,
         sessionRepository,
         SESSION_COOKIE_NAME,
         sessionCookieOptions

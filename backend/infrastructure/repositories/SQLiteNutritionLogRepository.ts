@@ -44,8 +44,8 @@ export class SQLiteNutritionLogRepository implements NutritionLogRepository {
 
 		// Insert the log, extracting values from the entity and its nested value object
 		await this.db.run(
-			`INSERT INTO nutrition_logs (id, user_id, calories, description, date) VALUES (?, ?, ?, ?, ?)`,
-			[log.id, log.userId, log.nutritionEntry.calories, log.nutritionEntry.description, dateStr]
+			`INSERT INTO nutrition_logs (id, user_id, calories, description, emoji_icon, date) VALUES (?, ?, ?, ?, ?, ?)`,
+			[log.id, log.userId, log.nutritionEntry.calories, log.nutritionEntry.description, log.nutritionEntry.emojiIcon, dateStr]
 		);
 	}
 
@@ -66,6 +66,7 @@ export class SQLiteNutritionLogRepository implements NutritionLogRepository {
 			user_id: string;
 			calories: number;
 			description: string;
+			emoji_icon: string;
 			date: string;
 		}>(`SELECT * FROM nutrition_logs WHERE user_id = ? AND date = ?`, [userId, dateStr]);
 
@@ -74,7 +75,7 @@ export class SQLiteNutritionLogRepository implements NutritionLogRepository {
 		return rows.map(r => new NutritionLog(
 			r.id,
 			r.user_id,
-			new NutritionEntry(r.calories, r.description),
+			new NutritionEntry(r.calories, r.description, r.emoji_icon),
 			new Date(r.date)
 		));
 	}

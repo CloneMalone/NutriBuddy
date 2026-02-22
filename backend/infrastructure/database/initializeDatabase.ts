@@ -37,6 +37,7 @@ export async function initializeDatabase(db: DatabaseClient): Promise<void> {
             user_id TEXT NOT NULL,
             calories INTEGER NOT NULL,
             description TEXT NOT NULL,
+            emoji_icon TEXT NOT NULL,
             date TEXT NOT NULL,
             FOREIGN KEY(user_id) REFERENCES users(id)
         );

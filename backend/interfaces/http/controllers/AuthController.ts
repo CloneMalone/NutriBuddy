@@ -17,6 +17,7 @@ import { Request, Response } from "express";
 // Import use cases that this controller will call
 import { RegisterUser } from "../../../application/useCases/RegisterUser";
 import { LoginUser } from "../../../application/useCases/LoginUser";
+import { GetUserProfile } from "../../../application/useCases/GetUserProfile";
 
 // Import crypto for generating UUIDs
 import { randomUUID } from "crypto";
@@ -34,6 +35,9 @@ export class AuthController {
         
         // Use case for authenticating users
         private readonly loginUser: LoginUser,
+        
+        // Use case for fetching the authenticated user's profile
+        private readonly getUserProfile: GetUserProfile,
         
         // Repository for creating sessions after successful login
         private readonly sessionRepository: SessionRepository,
@@ -117,6 +121,35 @@ export class AuthController {
             }
 
             // For unexpected errors, log and return 500 Internal Server Error
+            console.error(error);
+            return res.status(500).json({ error: "Internal server error" });
+        }
+    };
+
+    /**
+     * Handle GET /api/users/me
+     * 
+     * Returns the authenticated user's profile data.
+     * Requires a valid session (req.userId set by session middleware).
+     */
+    getProfile = async (req: Request, res: Response) => {
+        try {
+            // req.userId is set by session middleware for authenticated requests
+            const userId = (req as any).userId as string | undefined;
+
+            if (!userId) {
+                return res.status(401).json({ error: "Not authenticated" });
+            }
+
+            // Call the use case to retrieve the user's profile
+            const profile = await this.getUserProfile.execute(userId);
+
+            return res.status(200).json({ user: profile });
+        } catch (error) {
+            if (error instanceof DomainError) {
+                return res.status(404).json({ error: error.message });
+            }
+
             console.error(error);
             return res.status(500).json({ error: "Internal server error" });
         }

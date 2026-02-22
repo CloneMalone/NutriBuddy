@@ -34,6 +34,9 @@ export function createAuthRoutes(authController: AuthController): Router {
     // POST /api/users/login - Authenticate user
     router.post("/login", authController.login);
 
+    // GET /api/users/me - Get authenticated user's profile
+    router.get("/me", authController.getProfile);
+
     return router;
 }
 

@@ -14,9 +14,12 @@ function App() {
 
   return (
     <Routes>
+      {/* Public routes */}
       <Route path="/" element={<HomePage />} />
       <Route path="/register" element={<RegisterPage />} />
       <Route path="/login" element={<LoginPage />} />
+
+      {/* Authenticated routes — each page renders its own nav */}
       <Route path="/dashboard" element={<DashboardPage />} />
       <Route path="/add-entry" element={<AddEntryPage />} />
       <Route path="/settings" element={<SettingsPage />} />

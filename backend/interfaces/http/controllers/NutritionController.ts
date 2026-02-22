@@ -47,7 +47,7 @@ export class NutritionController {
 			}
 
 			// Extract nutrition data from request body
-			const { calories, description, date } = req.body;
+			const { calories, description, emojiIcon, date } = req.body;
 
 			// Use provided date or default to today
 			const entryDate = date ? new Date(date) : new Date();
@@ -58,6 +58,7 @@ export class NutritionController {
 				userId,                    // Link to the logged-in user
 				calories: Number(calories), // Ensure calories is a number
 				description: String(description), // Ensure description is a string
+				emojiIcon: String(emojiIcon), // Ensure emojiIcon is a string
 				date: entryDate
 			});
 
@@ -106,6 +107,7 @@ export class NutritionController {
 				id: l.id,
 				calories: l.nutritionEntry.calories,
 				description: l.nutritionEntry.description,
+				emojiIcon: l.nutritionEntry.emojiIcon,
 				date: l.date.toISOString().split("T")[0]  // Return date as YYYY-MM-DD string
 			}));
 

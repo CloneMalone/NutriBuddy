@@ -31,18 +31,18 @@ export class AddNutritionLog {
      * Create and save a new nutrition log entry.
      * 
      * @param input - Data from the HTTP request
-     * @throws DomainError if calories or description are invalid
+     * @throws DomainError if calories, description, or emojiIcon are invalid
      */
     async execute(input: {
         id: string;
         userId: string;
         calories: number;
         description: string;
+        emojiIcon: string;
         date: Date;
     }): Promise<void> {
         // Step 1: Create validated NutritionEntry value object
-        // This will throw DomainError if calories <= 0 or > 10000, or if description is empty
-        const entry = new NutritionEntry(input.calories, input.description);
+        const entry = new NutritionEntry(input.calories, input.description, input.emojiIcon);
 
         // Step 2: Create the NutritionLog entity
         const log = new NutritionLog(

@@ -21,7 +21,7 @@ export default function ErrorToast({ message, onDismiss }: ErrorToastProps) {
     return (
         <>
             {message && (
-                <div className="toast">
+                <div className="toast mb-20">
                     <div className="alert alert-error">
                         <span>{message}</span>
                     </div>

@@ -21,7 +21,7 @@ export default function SuccessToast({ message, onDismiss }: SuccessToastProps) 
     return (
         <>
             {message && (
-                <div className="toast">
+                <div className="toast mb-20">
                     <div className="alert alert-success">
                         <span>{message}</span>
                     </div>

@@ -16,7 +16,10 @@ export class NutritionEntry {
     // A description of what was eaten (e.g., "Grilled chicken salad")
     public readonly description: string;
 
-    constructor(calories: number, description: string) {
+    // An emoji representing the food item
+    public readonly emojiIcon: string;
+
+    constructor(calories: number, description: string, emojiIcon: string) {
         // Validation: Description must not be empty
         if (!description.trim()) {
             throw new DomainError("Description must not be empty");
@@ -37,8 +40,24 @@ export class NutritionEntry {
             throw new DomainError("Calories must be less than 10,000");
         }
 
+        // Validation: Description should be reasonably short (e.g., max 50 characters)
+        if (description.length > 50) {
+            throw new DomainError("Description must be 50 characters or less");
+        }
+
+        // Validation: Emoji icon must be a single character
+        if (emojiIcon.length > 2) {
+            throw new DomainError("Emoji icon must be a single emoji character");
+        }
+
+        if (emojiIcon.length === 0) {
+            this.emojiIcon = "🍽️"; // Default icon if none provided
+        }
+
         // All validations passed - store the values
         this.calories = calories;
         this.description = description.trim();
+        this.emojiIcon = emojiIcon;
+
     }
 }

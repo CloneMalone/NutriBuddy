@@ -1,6 +1,6 @@
 import { useCallback, useState, type FormEvent, type ChangeEvent } from "react";
 import { useNavigate } from "react-router-dom";
-import { registerUser } from "../api/auth";
+import { registerUser } from "../api/registerUserApi";
 
 /** All form field names, kept in sync with the input `name` attributes. */
 interface RegisterFormState {
@@ -69,5 +69,7 @@ export function useRegister() {
     }
   }
 
+  // Return everything the RegisterPage needs to 
+  // render the form and display feedback.
   return { form, error, loading, handleChange, handleSubmit, clearError };
 }
