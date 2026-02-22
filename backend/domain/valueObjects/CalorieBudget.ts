@@ -1,5 +1,5 @@
 /**
- * UserCalorieBudget Value Object - Represents a user's daily calorie goal.
+ * CalorieBudget Value Object - Represents a user's daily calorie goal.
  * 
  * Validates that the calorie budget is within a reasonable range.
  * Most adults need between 1,500-3,000 calories per day, but we allow
@@ -9,7 +9,7 @@
 // Import DomainError so we can throw meaningful business logic errors
 import { DomainError } from "../DomainError";
 
-export class UserCalorieBudget {
+export class CalorieBudget {
     // The calorie budget as a whole number
     public readonly value: number;
 

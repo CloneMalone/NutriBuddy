@@ -18,10 +18,10 @@ import { UserRepository } from "../../domain/repositories/UserRepository";
 
 // Import domain entities and value objects
 import { User } from "../../domain/entities/User";
-import { UserEmailEntry } from "../../domain/valueObjects/UserEmailEntry";
-import { UserHashedPassword } from "../../domain/valueObjects/UserHashedPassword";
-import { UserPasswordEntry } from "../../domain/valueObjects/UserPasswordEntry";
-import { UserCalorieBudget } from "../../domain/valueObjects/UserCalorieBudget";
+import { EmailAddress } from "../../domain/valueObjects/EmailAddress";
+import { HashedPassword } from "../../domain/valueObjects/HashedPassword";
+import { PlainPassword } from "../../domain/valueObjects/PlainPassword";
+import { CalorieBudget } from "../../domain/valueObjects/CalorieBudget";
 
 // Import service interface for password hashing
 import { PasswordHasher } from "../../domain/services/PasswordHasher";
@@ -62,9 +62,9 @@ export class RegisterUser {
 
         // Step 1: Create validated value objects
         // These constructors will throw DomainError if validation fails
-        const email = new UserEmailEntry(input.email);
-        const passwordEntry = new UserPasswordEntry(input.password, input.confirmPassword);
-        const userCalorieBudget = new UserCalorieBudget(input.calorieBudget);
+        const email = new EmailAddress(input.email);
+        const passwordEntry = new PlainPassword(input.password, input.confirmPassword);
+        const calorieBudget = new CalorieBudget(input.calorieBudget);
 
         // Step 2: Check if a user already exists with this email
         const existingUser = await this.userRepository.findByEmail(email);
@@ -75,7 +75,7 @@ export class RegisterUser {
         // Step 3: Hash the validated password using our password hasher service
         // This converts the plain-text password into something like "$2b$10$N9qo8uLOickgx..."
         const hashedPassword = await this.passwordHasher.hash(passwordEntry.value);
-        const userPassword = new UserHashedPassword(hashedPassword);
+        const userPassword = new HashedPassword(hashedPassword);
 
         // Step 4: Create the User entity with all validated data
         const user = new User(
@@ -84,7 +84,7 @@ export class RegisterUser {
             input.lastName,
             email,
             userPassword,
-            userCalorieBudget
+            calorieBudget
         );
 
         // Step 5: Persist the user to the database

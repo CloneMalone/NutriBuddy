@@ -10,9 +10,9 @@
  */
 
 // Import value objects - these ensure each field meets our business rules
-import { UserEmailEntry } from "../valueObjects/UserEmailEntry";
-import { UserHashedPassword } from "../valueObjects/UserHashedPassword";
-import { UserCalorieBudget } from "../valueObjects/UserCalorieBudget";
+import { EmailAddress } from "../valueObjects/EmailAddress";
+import { HashedPassword } from "../valueObjects/HashedPassword";
+import { CalorieBudget } from "../valueObjects/CalorieBudget";
 
 export class User {
     constructor(
@@ -25,13 +25,13 @@ export class User {
         // User's last name (plain string - no special validation needed)
         public readonly lastName: string,
         
-        // User's email wrapped in UserEmailEntry value object (validates format)
-        public readonly email: UserEmailEntry,
+        // User's email wrapped in EmailAddress value object (validates format)
+        public readonly email: EmailAddress,
         
-        // Hashed password wrapped in UserHashedPassword value object (ensures not empty)
-        public readonly passwordHash: UserHashedPassword,
+        // Hashed password wrapped in HashedPassword value object (ensures not empty)
+        public readonly passwordHash: HashedPassword,
         
-        // Daily calorie goal wrapped in UserCalorieBudget value object (validates range 1-7000)
-        public readonly calorieBudget: UserCalorieBudget
+        // Daily calorie goal wrapped in CalorieBudget value object (validates range 1-7000)
+        public readonly calorieBudget: CalorieBudget
     ) { }
 }

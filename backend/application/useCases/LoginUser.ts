@@ -14,7 +14,7 @@
 import { UserRepository } from "../../domain/repositories/UserRepository";
 
 // Import value object for email validation
-import { UserEmailEntry } from "../../domain/valueObjects/UserEmailEntry";
+import { EmailAddress } from "../../domain/valueObjects/EmailAddress";
 
 // Import error type for authentication failures
 import { DomainError } from "../../domain/DomainError";
@@ -44,7 +44,7 @@ export class LoginUser {
      */
     async execute(input: { email: string; password: string }): Promise<User> {
         // Step 1: Create validated email value object
-        const email = new UserEmailEntry(input.email);
+        const email = new EmailAddress(input.email);
 
         // Step 2: Look up the user in the database
         const user = await this.userRepository.findByEmail(email);

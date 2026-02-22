@@ -1,5 +1,5 @@
 /**
- * UserPasswordEntry Value Object - Validates a user's raw password input.
+ * PlainPassword Value Object - Validates a user's raw password input.
  * 
  * This value object represents the plain-text password as entered by the user
  * during registration. It enforces password strength rules and confirms that
@@ -7,7 +7,7 @@
  * 
  * IMPORTANT: This is NOT the hashed password. After validation, the `value`
  * should be passed to the PasswordHasher service for hashing, and the result
- * stored in a UserHashedPassword value object.
+ * stored in a HashedPassword value object.
  * 
  * Password rules:
  * - At least 8 characters
@@ -19,7 +19,7 @@
 
 import { DomainError } from "../DomainError";
 
-export class UserPasswordEntry {
+export class PlainPassword {
     public readonly value: string;
 
     constructor(password: string, confirmPassword: string) {

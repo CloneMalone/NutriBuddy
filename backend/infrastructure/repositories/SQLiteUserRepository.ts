@@ -15,9 +15,9 @@ import { UserRepository } from "../../domain/repositories/UserRepository";
 
 // Import domain entities and value objects
 import { User } from "../../domain/entities/User";
-import { UserEmailEntry } from "../../domain/valueObjects/UserEmailEntry";
-import { UserHashedPassword } from "../../domain/valueObjects/UserHashedPassword";
-import { UserCalorieBudget } from "../../domain/valueObjects/UserCalorieBudget";
+import { EmailAddress } from "../../domain/valueObjects/EmailAddress";
+import { HashedPassword } from "../../domain/valueObjects/HashedPassword";
+import { CalorieBudget } from "../../domain/valueObjects/CalorieBudget";
 
 // Import the database client interface
 import { DatabaseClient } from "../database/DatabaseClient";
@@ -62,9 +62,9 @@ export class SQLiteUserRepository implements UserRepository {
                 user.id,
                 user.firstName,
                 user.lastName,
-                user.email.value,           // Extract string from UserEmailEntry
-                user.passwordHash.value,    // Extract string from UserHashedPassword  
-                user.calorieBudget.value    // Extract number from UserCalorieBudget
+                user.email.value,           // Extract string from EmailAddress
+                user.passwordHash.value,    // Extract string from HashedPassword  
+                user.calorieBudget.value    // Extract number from CalorieBudget
             ]
         );
     }
@@ -72,10 +72,10 @@ export class SQLiteUserRepository implements UserRepository {
     /**
      * Find a user by their email address.
      * 
-     * @param email - The email to search for (as a UserEmailEntry value object)
+     * @param email - The email to search for (as an EmailAddress value object)
      * @returns The User if found, or null if not found
      */
-    async findByEmail(email: UserEmailEntry): Promise<User | null> {
+    async findByEmail(email: EmailAddress): Promise<User | null> {
         // Query the database for a matching email
         const row = await this.db.get<UserRow>(
             `
@@ -127,9 +127,9 @@ export class SQLiteUserRepository implements UserRepository {
             row.id,
             row.first_name,
             row.last_name,
-            new UserEmailEntry(row.email),                // Wrap email string in value object
-            new UserHashedPassword(row.password_hash),   // Wrap hash string in value object
-            new UserCalorieBudget(row.calorie_budget)    // Wrap number in value object
+            new EmailAddress(row.email),                // Wrap email string in value object
+            new HashedPassword(row.password_hash),   // Wrap hash string in value object
+            new CalorieBudget(row.calorie_budget)    // Wrap number in value object
         );
     }
 }

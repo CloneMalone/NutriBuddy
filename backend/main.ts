@@ -111,11 +111,11 @@ async function bootstrap() {
     // ------------------------------------------------------------------------
     const app = express();
 
-    // CORS middleware - allows frontend (localhost:3000) to make requests
+    // CORS middleware - allows frontend (localhost:5173) to make requests
     // credentials: true allows cookies to be sent cross-origin
     app.use(
         cors({
-            origin: "http://localhost:3000",
+            origin: "http://localhost:5173",
             credentials: true
         })
     );

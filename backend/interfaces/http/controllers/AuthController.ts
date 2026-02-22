@@ -68,7 +68,7 @@ export class AuthController {
             });
 
             // Registration successful - return 201 Created
-            return res.status(201).json({ message: "User registered successfully" });
+            return res.status(201).json({ message: "Registration successful! Please log in." });
         } catch (error) {
             // If it's a business rule violation (DomainError), return 400 Bad Request
             if (error instanceof DomainError) {

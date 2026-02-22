@@ -1,7 +1,7 @@
 
 export default function LoginForm() {
     return (
-            <form className="flex flex-col w-full sm:bg-base-100 sm:card sm:shadow-md sm:max-w-md sm:w-full sm:rounded-box sm:border sm:border-primary" action="">
+            <form className="mb-30 flex flex-col w-full sm:bg-base-100 sm:card sm:shadow-md sm:max-w-md sm:w-full sm:rounded-box sm:border sm:border-primary" action="">
                 <div className="flex-1 flex flex-col justify-center gap-4 p-6 sm:card-body sm:gap-4">
                     <h2 className="card-title justify-center text-center text-3xl sm:text-2xl font-bold">🍊 Login to Your Account</h2>
                     <div className="form-control w-full">

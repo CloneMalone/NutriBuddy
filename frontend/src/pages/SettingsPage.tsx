@@ -1,14 +1,14 @@
 import AuthNavBar from "../components/AuthNavBar";
 import AuthNavDock from "../components/AuthNavDock";
-import AddEntryForm from "../components/AddEntryForm";
+import SettingsForm from "../components/SettingsForm";
 
 
-export default function AddEntryPage() {
+export default function SettingsPage() {
     return (
         <>
             <AuthNavBar />
             <section className="min-h-[calc(100dvh)] bg-base-200 flex items-stretch sm:items-center sm:justify-center">
-                <AddEntryForm />
+                <SettingsForm />
             </section>
             <AuthNavDock />
         </>

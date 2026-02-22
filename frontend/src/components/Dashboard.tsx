@@ -1,7 +1,14 @@
 export default function Dashboard() {
     return (
         <div className="container flex flex-col gap-6 p-6 mx-auto">
-            <h1 className="text-2xl font-bold">👋🏼 Hello, <span className="text-primary">Jenny!</span></h1>
+            <div className="flex flex-row justify-between">
+                <h1 className="text-2xl font-bold">👋🏼 Hello, <span className="text-primary">Jenny!</span></h1>
+                <div className="inline-grid *:[grid-area:1/1] items-center  gap-2">
+                    <div className="status status-success animate-ping"></div>
+                    <div className="status status-success"></div>
+                    <p className="text-xs uppercase font-semibold opacity-60 ml-3">Plenty Calories Left</p>
+                </div> 
+            </div>
             <div className="stats text-center bg-primary border-base-300 border w-full">
                 <div className="stat text-primary-content">
                     <div className="text">Calories Budget</div>
