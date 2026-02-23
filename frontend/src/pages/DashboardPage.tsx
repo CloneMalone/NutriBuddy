@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { useLocation } from "react-router-dom";
-import AuthNavBar from "../components/AuthNavBar";
-import AuthNavDock from "../components/AuthNavDock";
+import AuthLayout from "../components/AuthLayout";
 import Dashboard from "../components/Dashboard";
 import SuccessToast from "../components/SuccessToast";
 import { useUserProfile } from "../hooks/useUserProfile";
@@ -30,8 +29,7 @@ export default function DashboardPage() {
     }
 
     return (
-        <>
-            <AuthNavBar />
+        <AuthLayout>
             <section className="min-h-[calc(100dvh-4rem)] bg-base-200 flex flex-col">
                 <Dashboard
                     firstName={user?.firstName ?? ""}
@@ -42,7 +40,6 @@ export default function DashboardPage() {
                 />
             </section>
             <SuccessToast message={successMessage} onDismiss={dismissSuccess} />
-            <AuthNavDock />
-        </>
+        </AuthLayout>
     );
 }

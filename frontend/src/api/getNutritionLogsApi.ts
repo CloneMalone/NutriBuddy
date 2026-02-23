@@ -22,10 +22,11 @@ export async function getNutritionLogs(date: string): Promise<NutritionLogEntry[
         credentials: "include",
     });
 
+    const data = await response.json();
+
     if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error);
+        throw new Error(data.error);
     }
 
-    return response.json();
+    return data as NutritionLogEntry[];
 }

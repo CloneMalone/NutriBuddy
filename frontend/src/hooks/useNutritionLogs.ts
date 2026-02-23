@@ -1,9 +1,13 @@
 import { useCallback, useEffect, useState } from "react";
 import { getNutritionLogs, type NutritionLogEntry } from "../api/getNutritionLogsApi";
 
-/** Returns today's date as a YYYY-MM-DD string. */
+/** Returns today's date as a YYYY-MM-DD string. Local time */
 function todayDateString(): string {
-    return new Date().toISOString().split("T")[0]!;
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, "0");
+    const day = String(now.getDate()).padStart(2, "0");
+    return `${year}-${month}-${day}`;
 }
 
 /**

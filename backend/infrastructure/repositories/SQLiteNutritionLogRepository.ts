@@ -23,15 +23,16 @@ export class SQLiteNutritionLogRepository implements NutritionLogRepository {
 		this.db = db;
 	}
 
-	/**
-	 * Convert a Date to YYYY-MM-DD string format for SQLite storage.
-	 * We only store the date, not the time.
-	 */
-	private toDateString(date: Date): string {
-		// toISOString() returns "2024-01-15T10:30:00.000Z"
-		// split("T")[0] gives us just "2024-01-15"
-		return date.toISOString().split("T")[0]!;
-	}
+	 /**
+     * Convert a Date to YYYY-MM-DD string format for SQLite storage.
+     * Uses local time to match how the frontend sends dates.
+     */
+    private toDateString(date: Date): string {
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, "0");
+        const day = String(date.getDate()).padStart(2, "0");
+        return `${year}-${month}-${day}`;
+    }
 
 	/**
 	 * Save a new nutrition log entry to the database.

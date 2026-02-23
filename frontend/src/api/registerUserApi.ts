@@ -37,7 +37,5 @@ export async function registerUser(
     throw new Error(data.error ?? "Registration failed");
   }
 
-  // return the data as a RegisterResponse, 
-  // which has a "message" field with the success message from the server
   return data as RegisterResponse;
 }

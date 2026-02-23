@@ -29,10 +29,11 @@ export async function addNutritionLog(
         body: JSON.stringify(payload),
     });
 
+    const data = await response.json();
+
     if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error);
+        throw new Error(data.error);
     }
 
-    return response.json();
+    return data as AddNutritionLogResponse;
 }

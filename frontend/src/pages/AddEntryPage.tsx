@@ -1,5 +1,4 @@
-import AuthNavBar from "../components/AuthNavBar";
-import AuthNavDock from "../components/AuthNavDock";
+import AuthLayout from "../components/AuthLayout";
 import AddEntryForm from "../components/AddEntryForm";
 import ErrorToast from "../components/ErrorToast";
 import { useAddEntry } from "../hooks/useAddEntry";
@@ -13,8 +12,7 @@ export default function AddEntryPage() {
     const { form, loading, error, handleChange, handleSubmit, clearError } = useAddEntry();
 
     return (
-        <>
-            <AuthNavBar />
+        <AuthLayout>
             <section className="min-h-[calc(100dvh-4rem)] bg-base-200 flex items-stretch sm:items-center sm:justify-center">
                 <AddEntryForm
                     form={form}
@@ -24,7 +22,6 @@ export default function AddEntryPage() {
                 />
             </section>
             <ErrorToast message={error ?? undefined} onDismiss={clearError} />
-            <AuthNavDock />
-        </>
+        </AuthLayout>
     );
 }

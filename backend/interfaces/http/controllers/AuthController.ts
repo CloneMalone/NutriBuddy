@@ -154,4 +154,34 @@ export class AuthController {
             return res.status(500).json({ error: "Internal server error" });
         }
     };
+
+    /**
+     * Handle POST /api/users/logout
+     * 
+     * Destroys the user's session and clears the session cookie.
+     */
+    logout = async (req: Request, res: Response) => {
+        try {
+            // Manually parse the session ID from the Cookie header
+            // (No cookie-parser middleware — matches how sessionMiddleware parses cookies)
+            const cookieHeader = req.headers.cookie || "";
+            const sessionId = cookieHeader
+                .split(";")
+                .map(c => c.trim().split("="))
+                .find(([key]) => key === this.sessionCookieName)?.[1];
+
+            // If a session cookie exists, delete the session from the database
+            if (sessionId) {
+                await this.sessionRepository.delete(decodeURIComponent(sessionId));
+            }
+
+            // Clear the session cookie from the browser
+            res.clearCookie(this.sessionCookieName, this.sessionCookieOptions as any);
+
+            return res.status(200).json({ message: "Logged out successfully" });
+        } catch (error) {
+            console.error(error);
+            return res.status(500).json({ error: "Internal server error" });
+        }
+    };
 }

@@ -9,11 +9,6 @@ export interface UserProfile {
     calorieBudget: number;
 }
 
-/** Response wrapper from the backend */
-interface GetUserProfileResponse {
-    user: UserProfile;
-}
-
 /**
  * Fetches the authenticated user's profile from the backend.
  * Relies on the session cookie being sent automatically via `credentials: "include"`.
@@ -26,11 +21,11 @@ export async function getUserProfile(): Promise<UserProfile> {
         credentials: "include",
     });
 
-    if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error);
-    }
+    const data = await response.json();
 
-    const data: GetUserProfileResponse = await response.json();
-    return data.user;
+    if (!response.ok) {
+        throw new Error(data.error);
+    }
+    
+    return data.user as UserProfile;
 }

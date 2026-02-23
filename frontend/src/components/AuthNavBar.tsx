@@ -1,4 +1,15 @@
-export default function AuthNavBar() {
+interface AuthNavBarProps {
+    /** Called when the user clicks the Logout button. */
+    onLogout: () => void;
+    /** Whether the logout request is in progress. */
+    logoutLoading: boolean;
+}
+
+/**
+ * Dumb component — renders the authenticated navigation bar.
+ * Receives logout behavior as props from the parent (AuthLayout).
+ */
+export default function AuthNavBar({ onLogout, logoutLoading }: AuthNavBarProps) {
     return (
         <nav className="bg-base-100 shadow-sm">
             <div className="navbar container mx-auto pr-4">
@@ -23,7 +34,11 @@ export default function AuthNavBar() {
                             className="menu menu-lg dropdown-content bg-base-100 rounded-box z-1 mt-3 w-52 p-2 shadow">
                             
                             <li><a href="/profile">Profile</a></li>
-                            <li><a href="/login">Logout</a></li>
+                            <li>
+                                <button onClick={onLogout} disabled={logoutLoading}>
+                                    {logoutLoading ? "Logging out…" : "Logout"}
+                                </button>
+                            </li>
                         </ul>
                     </div>
                 </div>

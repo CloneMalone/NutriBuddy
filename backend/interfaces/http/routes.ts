@@ -8,6 +8,7 @@
  * API Endpoints:
  * - POST /api/users/register - Create a new user account
  * - POST /api/users/login    - Authenticate and get a session
+ * - POST /api/users/logout   - Destroy session and clear cookie
  * - POST /api/nutrition      - Add a nutrition log entry (requires auth)
  * - GET  /api/nutrition      - Get logs for a date (requires auth)
  */
@@ -33,6 +34,9 @@ export function createAuthRoutes(authController: AuthController): Router {
     
     // POST /api/users/login - Authenticate user
     router.post("/login", authController.login);
+
+    // POST /api/users/logout - Destroy session and clear cookie
+    router.post("/logout", authController.logout);
 
     // GET /api/users/me - Get authenticated user's profile
     router.get("/me", authController.getProfile);
