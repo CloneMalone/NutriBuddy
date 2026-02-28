@@ -6,6 +6,7 @@ import RegisterPage from './pages/RegisterPage'
 import LoginPage from './pages/LoginPage'
 import DashboardPage from './pages/DashboardPage'
 import AddEntryPage from './pages/AddEntryPage'
+import EditEntryPage from './pages/EditEntryPage'
 import SettingsPage from './pages/SettingsPage'
 import ProfilePage from './pages/ProfilePage'
 
@@ -22,6 +23,7 @@ function App() {
       {/* Authenticated routes — each page renders its own nav */}
       <Route path="/dashboard" element={<DashboardPage />} />
       <Route path="/add-entry" element={<AddEntryPage />} />
+      <Route path="/edit-entry/:logId" element={<EditEntryPage />} />
       <Route path="/settings" element={<SettingsPage />} />
       <Route path="/profile" element={<ProfilePage />} />
     </Routes>

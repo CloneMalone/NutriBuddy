@@ -1,5 +1,5 @@
-import AuthLayout from "../components/AuthLayout";
-import AddEntryForm from "../components/AddEntryForm";
+import AuthLayout from "../layouts/AuthLayout";
+import NutritionLogForm from "../components/NutritionLogForm";
 import ErrorToast from "../components/ErrorToast";
 import { useAddEntry } from "../hooks/useAddEntry";
 
@@ -14,7 +14,7 @@ export default function AddEntryPage() {
     return (
         <AuthLayout>
             <section className="min-h-[calc(100dvh-4rem)] bg-base-200 flex items-stretch sm:items-center sm:justify-center">
-                <AddEntryForm
+                <NutritionLogForm
                     form={form}
                     loading={loading}
                     onChange={handleChange}

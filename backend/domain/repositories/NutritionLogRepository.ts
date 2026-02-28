@@ -14,5 +14,11 @@ export interface NutritionLogRepository {
     
     // Get all nutrition logs for a specific user on a specific date
     // Used to display the user's daily food diary
-    findByUserAndDate(userId: string, date: Date): Promise<NutritionLog[]>;
+    findByUserAndDate(userId: string, date: string): Promise<NutritionLog[]>;
+
+    // Get a specific nutrition log by user ID and log ID
+    findByUserAndLogId(userId: string, logId: string): Promise<NutritionLog | null>;
+
+    // Update an existing nutrition log entry
+    update(log: NutritionLog): Promise<void>;
 }

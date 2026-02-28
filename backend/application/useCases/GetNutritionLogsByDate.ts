@@ -27,7 +27,7 @@ export class GetNutritionLogsByDate {
      */
     async execute(input: {
         userId: string;
-        date: Date;
+        date: string;  // YYYY-MM-DD
     }): Promise<NutritionLog[]> {
         // Delegate to the repository to fetch matching logs
         return this.nutritionLogRepository.findByUserAndDate(

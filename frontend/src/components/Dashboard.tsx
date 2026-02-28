@@ -8,7 +8,8 @@ interface DashboardProps {
         calories: number;
         emojiIcon: string;
     }[];
-    loading: boolean;
+    /** Called when the user clicks on an entry row (not the delete button). */
+    onEntryClick: (id: string) => void;
 }
 
 /** Determine the status color and message based on how close the user is to their calorie budget. */
@@ -43,7 +44,7 @@ function getCalorieStatus(budget: number, consumed: number) {
     };
 }
 
-export default function Dashboard({ firstName, calorieBudget, caloriesConsumed, entries, loading }: DashboardProps) {
+export default function Dashboard({ firstName, calorieBudget, caloriesConsumed, entries, onEntryClick }: DashboardProps) {
     const { color, message } = getCalorieStatus(calorieBudget, caloriesConsumed);
     const caloriesRemaining = calorieBudget - caloriesConsumed;
 
@@ -85,18 +86,8 @@ export default function Dashboard({ firstName, calorieBudget, caloriesConsumed, 
             <ul className="list bg-base-100 rounded-box shadow-md">
                 <li className="p-4 pb-2 text-xs opacity-60 tracking-wide">Today's Entries</li>
 
-                {/* Loading state */}
-                {loading && (
-                    <li className="list-row cursor-pointer rounded-none hover:bg-base-200">
-                        <div className="text-3xl">⏳</div>
-                        <div>
-                            <div>Loading...</div>
-                        </div>
-                    </li>
-                )}
-
-                {/* Empty state — shown when not loading and there are no entries */}
-                {!loading && entries.length === 0 && (
+                {/* Empty state — shown when there are no entries */}
+                {entries.length === 0 && (
                     <li className="list-row rounded-none">
                         <div className="text-3xl">📝</div>
                         <div>
@@ -110,13 +101,20 @@ export default function Dashboard({ firstName, calorieBudget, caloriesConsumed, 
 
                 {/* Render each entry */}
                 {entries.map((entry) => (
-                    <li key={entry.id} className="list-row cursor-pointer rounded-none hover:bg-base-200">
+                    <li
+                        key={entry.id}
+                        className="list-row cursor-pointer rounded-none hover:bg-base-200"
+                        onClick={() => onEntryClick(entry.id)}
+                    >
                         <div className="text-3xl">{entry.emojiIcon}</div>
                         <div>
                             <div>{entry.description}</div>
                             <div className="text-xs uppercase font-semibold opacity-60">{entry.calories} calories</div>
                         </div>
-                        <button className="btn btn-square btn-ghost">
+                        <button
+                            className="btn btn-square btn-ghost"
+                            onClick={(e) => e.stopPropagation()}
+                        >
                             <svg className="size-[1.2em]" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><g strokeLinejoin="round" strokeLinecap="round" strokeWidth="2" fill="none" stroke="currentColor"><path d="M3 6h18"></path><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path></g></svg>
                         </button>
                     </li>

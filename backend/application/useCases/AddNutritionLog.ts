@@ -39,7 +39,7 @@ export class AddNutritionLog {
         calories: number;
         description: string;
         emojiIcon: string;
-        date: Date;
+        date: string;  // YYYY-MM-DD
     }): Promise<void> {
         // Step 1: Create validated NutritionEntry value object
         const entry = new NutritionEntry(input.calories, input.description, input.emojiIcon);

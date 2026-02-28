@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import Toast from "./Toast";
 
 interface SuccessToastProps {
     message?: string;
@@ -6,27 +6,7 @@ interface SuccessToastProps {
     onDismiss?: () => void;
 }
 
-/** Auto-dismissing success toast — disappears after 5 seconds. */
+/** Auto-dismissing success toast with smooth fade-out. */
 export default function SuccessToast({ message, onDismiss }: SuccessToastProps) {
-    useEffect(() => {
-        if (!message) return;
-
-        const timer = setTimeout(() => {
-            onDismiss?.();
-        }, 5000);
-
-        return () => clearTimeout(timer);
-    }, [message, onDismiss]);
-
-    return (
-        <>
-            {message && (
-                <div className="toast mb-20">
-                    <div className="alert alert-success">
-                        <span>{message}</span>
-                    </div>
-                </div>
-            )}
-        </>
-    );
+    return <Toast message={message} variant="alert-success" onDismiss={onDismiss} />;
 }

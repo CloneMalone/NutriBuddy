@@ -1,7 +1,7 @@
 import type { ChangeEvent, FormEvent } from "react";
 
 /** Props passed down from the page component — keeps this component purely presentational. */
-interface AddEntryFormProps {
+interface NutritionLogFormProps {
     form: {
         emojiIcon: string;
         description: string;
@@ -11,17 +11,28 @@ interface AddEntryFormProps {
     loading: boolean;
     onChange: (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => void;
     onSubmit: (e: FormEvent) => void;
+    /** Heading displayed at the top of the form. */
+    title?: string;
+    /** Label for the submit button. */
+    submitLabel?: string;
 }
 
-/** Presentational form for adding a nutrition log entry. */
-export default function AddEntryForm({ form, loading, onChange, onSubmit }: AddEntryFormProps) {
+/** Reusable presentational form for adding or editing a nutrition log entry. */
+export default function NutritionLogForm({
+    form,
+    loading,
+    onChange,
+    onSubmit,
+    title = "🥕 Add a Food Entry",
+    submitLabel = "Add Entry",
+}: NutritionLogFormProps) {
     return (
         <form
             className="mb-30 flex flex-col w-full sm:bg-base-100 sm:card sm:shadow-md sm:max-w-md sm:rounded-box sm:border sm:border-primary"
             onSubmit={onSubmit}
         >
             <div className="flex-1 flex flex-col justify-center gap-4 p-6 sm:card-body sm:gap-4">
-                <h2 className="card-title justify-center text-center text-3xl sm:text-2xl font-bold">🥕 Add a Food Entry</h2>
+                <h2 className="card-title justify-center text-center text-3xl sm:text-2xl font-bold">{title}</h2>
 
                 {/* Emoji icon selector */}
                 <div className="form-control w-full">
@@ -91,7 +102,7 @@ export default function AddEntryForm({ form, loading, onChange, onSubmit }: AddE
                     className="btn btn-primary mt-4 w-full btn-xl sm:btn-md"
                     disabled={loading}
                 >
-                    {loading ? <span className="loading loading-spinner loading-sm" /> : "Add Entry"}
+                    {loading ? <span className="loading loading-spinner loading-sm" /> : submitLabel}
                 </button>
             </div>
         </form>

@@ -19,14 +19,14 @@ export class NutritionLog {
     // The nutrition data (calories + description) wrapped in a value object
     public readonly nutritionEntry: NutritionEntry;
     
-    // The date this food was consumed
-    public readonly date: Date;
+    // The date this food was consumed (YYYY-MM-DD string to avoid timezone bugs)
+    public readonly date: string;
 
     constructor(
         id: string,
         userId: string,
         nutritionEntry: NutritionEntry,
-        date: Date
+        date: string
     ) {
         // Assign all values to their respective properties
         this.id = id;

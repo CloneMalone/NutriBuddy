@@ -18,6 +18,7 @@ import { Request, Response } from "express";
 import { RegisterUser } from "../../../application/useCases/RegisterUser";
 import { LoginUser } from "../../../application/useCases/LoginUser";
 import { GetUserProfile } from "../../../application/useCases/GetUserProfile";
+import { CheckSession } from "../../../application/useCases/CheckSession";
 
 // Import crypto for generating UUIDs
 import { randomUUID } from "crypto";
@@ -38,6 +39,9 @@ export class AuthController {
         
         // Use case for fetching the authenticated user's profile
         private readonly getUserProfile: GetUserProfile,
+
+        // Use case for checking if a session is still valid
+        private readonly checkSessionUseCase: CheckSession,
         
         // Repository for creating sessions after successful login
         private readonly sessionRepository: SessionRepository,
@@ -89,6 +93,8 @@ export class AuthController {
      * Handle POST /api/users/login
      * 
      * Authenticates a user and creates a session.
+     * Any existing sessions for the user are removed first to prevent
+     * duplicate sessions from accumulating across repeated logins.
      */
     login = async (req: Request, res: Response) => {
         try {
@@ -98,6 +104,11 @@ export class AuthController {
             // Call the use case to authenticate the user
             // Returns the User entity if credentials are valid
             const user = await this.loginUser.execute({ email, password });
+
+            // Remove any existing sessions for this user before creating a new one.
+            // This prevents duplicate sessions from piling up when a user logs in
+            // again without explicitly logging out first.
+            await this.sessionRepository.deleteByUserId(user.id);
 
             // Create a new session for the authenticated user
             const sessionId = randomUUID();
@@ -152,6 +163,35 @@ export class AuthController {
 
             console.error(error);
             return res.status(500).json({ error: "Internal server error" });
+        }
+    };
+
+    /**
+     * Handle GET /api/users/check-session
+     * 
+     * Returns whether the current session cookie maps to a valid, authenticated user.
+     * Used by the frontend to auto-redirect already-logged-in users away from /login.
+     */
+    checkSession = async (req: Request, res: Response) => {
+        try {
+            // req.userId is set by session middleware for authenticated requests
+            const userId = (req as any).userId as string | undefined;
+
+            if (!userId) {
+                return res.status(401).json({ authenticated: false, error: "Not authenticated" });
+            }
+
+            // Call the use case to confirm the user record still exists
+            const result = await this.checkSessionUseCase.execute(userId);
+
+            return res.status(200).json(result);
+        } catch (error) {
+            if (error instanceof DomainError) {
+                return res.status(401).json({ authenticated: false, error: error.message });
+            }
+
+            console.error(error);
+            return res.status(500).json({ authenticated: false, error: "Internal server error" });
         }
     };
 

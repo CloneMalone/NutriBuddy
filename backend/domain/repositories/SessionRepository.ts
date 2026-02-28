@@ -33,6 +33,10 @@ export interface SessionRepository {
     // Delete a specific session (used for logout)
     delete(sessionId: string): Promise<void>;
     
+    // Delete all sessions belonging to a specific user
+    // Used during login to prevent duplicate sessions from accumulating
+    deleteByUserId(userId: string): Promise<void>;
+    
     // Clean up old sessions that have passed their expiration date
     deleteExpired(): Promise<void>;
 }

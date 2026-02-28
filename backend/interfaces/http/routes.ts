@@ -38,6 +38,9 @@ export function createAuthRoutes(authController: AuthController): Router {
     // POST /api/users/logout - Destroy session and clear cookie
     router.post("/logout", authController.logout);
 
+    // GET /api/users/check-session - Check if session cookie is still valid
+    router.get("/check-session", authController.checkSession);
+
     // GET /api/users/me - Get authenticated user's profile
     router.get("/me", authController.getProfile);
 
@@ -58,6 +61,12 @@ export function createNutritionRoutes(nutritionController: NutritionController):
     
     // GET /api/nutrition - Get logs for a date
     router.get("/", nutritionController.getLogsByDate);
+
+    // GET /api/nutrition/:logId - Get a specific log by ID
+    router.get("/:logId", nutritionController.getLogById);
+
+    // PUT /api/nutrition/:logId - Update an existing log entry
+    router.put("/:logId", nutritionController.updateLog);
 
     return router;
 }

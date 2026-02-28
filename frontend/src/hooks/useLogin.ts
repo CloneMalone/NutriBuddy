@@ -16,6 +16,7 @@ const INITIAL_STATE: LoginFormState = {
 /** Orchestrates login form state, validation, API call, and navigation.
  * Called exclusively in LoginPage — returns everything the page needs to
  * render the form and display toast feedback.
+ * Session checking is handled by useSessionGuard in the page component.
  */
 export function useLogin() {
   const navigate = useNavigate();
