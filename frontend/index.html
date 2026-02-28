@@ -10,6 +10,11 @@
 </head>
 
 <body>
+  <!-- Apply the saved theme immediately to prevent a flash of the wrong theme -->
+  <script>
+    document.documentElement.setAttribute("data-theme",
+      localStorage.getItem("nutribuddy-theme") || "halloween");
+  </script>
   <main id="root"></main>
   <script type="module" src="/src/main.tsx"></script>
 </body>
