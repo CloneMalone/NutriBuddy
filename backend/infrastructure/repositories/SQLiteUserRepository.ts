@@ -122,6 +122,19 @@ export class SQLiteUserRepository implements UserRepository {
      * Since the values already passed validation when first saved,
      * the value object constructors should not throw here.
      */
+    /**
+     * Update a user's daily calorie budget.
+     *
+     * @param userId - The user's UUID
+     * @param calorieBudget - The new CalorieBudget value object (already validated)
+     */
+    async updateCalorieBudget(userId: string, calorieBudget: CalorieBudget): Promise<void> {
+        await this.db.run(
+            `UPDATE users SET calorie_budget = ? WHERE id = ?`,
+            [calorieBudget.value, userId]
+        );
+    }
+
     private mapRowToUser(row: UserRow): User {
         return new User(
             row.id,

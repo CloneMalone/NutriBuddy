@@ -1,14 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { getNutritionLogs, type NutritionLogEntry } from "../api/getNutritionLogsApi";
-
-/** Returns today's date as a YYYY-MM-DD string. Local time */
-function todayDateString(): string {
-    const now = new Date();
-    const year = now.getFullYear();
-    const month = String(now.getMonth() + 1).padStart(2, "0");
-    const day = String(now.getDate()).padStart(2, "0");
-    return `${year}-${month}-${day}`;
-}
+import todayDateString from "../utils/todayDateString";
 
 /**
  * Fetches nutrition logs for a given date and computes caloriesConsumed

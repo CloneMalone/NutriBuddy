@@ -23,6 +23,7 @@ import { AddNutritionLog } from "../../../application/useCases/AddNutritionLog";
 import { GetNutritionLogsByDate } from "../../../application/useCases/GetNutritionLogsByDate";
 import { GetNutritionLogById } from "../../../application/useCases/GetNutritionLogById";
 import { UpdateNutritionLog } from "../../../application/useCases/UpdateNutritionLog";
+import { DeleteNutritionLog } from "../../../application/useCases/DeleteNutritionLog";
 
 // Import crypto for generating UUIDs
 import { randomUUID } from "crypto";
@@ -42,7 +43,10 @@ export class NutritionController {
 		private readonly getNutritionLogById: GetNutritionLogById,
 
 		// Use case for updating an existing nutrition log
-		private readonly updateNutritionLog: UpdateNutritionLog
+		private readonly updateNutritionLog: UpdateNutritionLog,
+
+		// Use case for deleting an existing nutrition log
+		private readonly deleteNutritionLog: DeleteNutritionLog
 	) {}
 
 	/**
@@ -226,6 +230,46 @@ export class NutritionController {
 			return res.status(200).json({ message: "Nutrition log updated" });
 		} catch (err) {
 			// If it's a validation error, return 400 Bad Request
+			if (err instanceof DomainError) {
+				return res.status(400).json({ error: err.message });
+			}
+
+			// For unexpected errors, log and return 500 Internal Server Error
+			console.error(err);
+			return res.status(500).json({ error: "Internal server error" });
+		}
+	};
+
+	/**
+	 * Handle DELETE /api/nutrition/:logId
+	 *
+	 * Deletes an existing nutrition log entry for the logged-in user.
+	 */
+	deleteLog = async (req: Request, res: Response) => {
+		try {
+			// Get the user ID from the session
+			const userId = (req as any).userId as string | undefined;
+
+			// If no userId, user is not logged in - return 401 Unauthorized
+			if (!userId) {
+				return res.status(401).json({ error: "Unauthorized" });
+			}
+
+			// Get log ID from route parameters
+			const logId = req.params.logId as string | undefined;
+
+			// If no logId, return 400 Bad Request
+			if (!logId) {
+				return res.status(400).json({ error: "Log ID is required" });
+			}
+
+			// Call the use case to delete the log entry
+			await this.deleteNutritionLog.execute({ userId, logId });
+
+			// Success - return 200 OK
+			return res.status(200).json({ message: "Nutrition log deleted" });
+		} catch (err) {
+			// If it's a domain error (e.g. log not found), return 400 Bad Request
 			if (err instanceof DomainError) {
 				return res.status(400).json({ error: err.message });
 			}

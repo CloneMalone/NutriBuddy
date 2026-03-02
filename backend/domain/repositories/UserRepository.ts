@@ -13,6 +13,7 @@
 // Import the entity and value object this repository handles
 import { User } from "../entities/User";
 import { EmailAddress } from "../valueObjects/EmailAddress";
+import { CalorieBudget } from "../valueObjects/CalorieBudget";
 
 export interface UserRepository {
     // Save a new user to the database
@@ -25,4 +26,7 @@ export interface UserRepository {
     // Find a user by their unique ID
     // Returns null if no user exists with that ID
     findById(id: string): Promise<User | null>;
+
+    // Update a user's daily calorie budget
+    updateCalorieBudget(userId: string, calorieBudget: CalorieBudget): Promise<void>;
 }

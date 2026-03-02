@@ -1,15 +1,18 @@
 # NutriBuddy
 
-A nutrition tracking application that helps users monitor their daily calorie intake against personalized daily budgets. Built with **Clean Architecture** and **Domain-Driven Design** principles.
+A full-stack nutrition tracking application that helps users monitor their daily calorie intake against personalized daily budgets. Built with **Clean Architecture** and **Domain-Driven Design** principles.
 
 ## Features
 
-- **User Authentication** — Secure registration and login with bcrypt password hashing and session-based authentication
-- **Session Management** — Cookie-based sessions with configurable expiration (24-hour default)
-- **Nutrition Tracking** — Log daily nutrition entries with calorie counts (1–10,000) and food descriptions
-- **Daily Summaries** — View all nutrition entries for a specific date
-- **Calorie Budget Management** — Set personal daily calorie goals (1–7,000 range)
-- **Input Validation** — Domain-driven validation through value objects ensures data integrity
+- **User Registration & Login** — Secure account creation with password strength enforcement (8+ chars, uppercase, number, special character) and bcrypt hashing (10 salt rounds)
+- **Session Management** — Cookie-based sessions (`httpOnly`, `sameSite: lax`) with 24-hour expiration; automatic session guard on protected routes
+- **Nutrition Logging (Full CRUD)** — Create, view, edit, and delete food entries with emoji icons, descriptions (max 50 chars), and calorie counts (1–10,000)
+- **Daily Dashboard** — View all nutrition entries for a selected date with calorie budget vs. consumed stats; date picker prevents future date selection
+- **Calorie Budget Management** — Set and update a personal daily calorie goal (1–7,000 range) from the profile page
+- **Theme Switching** — Choose from 35 DaisyUI themes via the settings page, persisted in `localStorage`
+- **Domain-Driven Validation** — Immutable value objects enforce business rules at the domain layer (email format, password strength, calorie ranges, description length)
+- **Responsive Design** — Mobile-first layout with bottom navigation dock on authenticated pages, card-based desktop layout
+- **Toast Notifications** — Auto-dismissing success/error toasts (5s display + 300ms fade animation) for user feedback across page navigations
 
 ## Technology Stack
 
@@ -20,18 +23,20 @@ A nutrition tracking application that helps users monitor their daily calorie in
 | **TypeScript** | Strongly typed JavaScript for robust backend code |
 | **Node.js** | JavaScript runtime environment |
 | **Express.js 5.x** | Web framework for HTTP routing and middleware |
-| **SQLite** | Lightweight relational database (3 tables: users, sessions, nutrition_logs) |
+| **SQLite** | Lightweight relational database (3 tables: `users`, `sessions`, `nutrition_logs`) |
 | **Bcrypt** | Secure password hashing (10 salt rounds) |
 
 ### Frontend
 
 | Technology | Purpose |
 |------------|---------|
-| **React 19** | UI library for building interactive user interfaces |
+| **React 19** | UI library with functional components and hooks |
 | **TypeScript** | Type-safe React development |
-| **Vite 7** | Fast development server and build tool |
+| **React Router 7** | Client-side routing with route state for cross-page messages |
+| **Vite 7** | Fast development server with API proxy and build tool |
 | **Tailwind CSS 4** | Utility-first CSS framework for styling |
-| **DaisyUI 5** | Tailwind CSS component library |
+| **DaisyUI 5** | Tailwind CSS component library (cards, modals, docks, stats, avatars, skeletons) |
+| **Cally** | Native web component for the date picker |
 | **Poppins** | Google Fonts typeface used across the app |
 
 ## Architecture
@@ -42,68 +47,41 @@ This project follows **Clean Architecture** and **Domain-Driven Design** princip
 
 ```
 backend/
-├── main.ts                          # Entry point (Composition Root)
-├── domain/                          # INNERMOST LAYER — Pure business logic
-│   ├── DomainError.ts               # Custom error for business rule violations
-│   ├── entities/                    # Objects with identity
-│   │   ├── User.ts                  # User entity
-│   │   └── NutritionLog.ts          # Nutrition log entity
-│   ├── valueObjects/                # Immutable, self-validating objects
-│   │   ├── UserEmail.ts             # Validates email format
-│   │   ├── UserPassword.ts          # Wraps hashed password
-│   │   ├── UserCalorieBudget.ts     # Validates 1–7,000 range
-│   │   └── NutritionEntry.ts        # Validates calories (1–10,000) and description
-│   ├── repositories/                # Interface definitions (abstractions)
-│   │   ├── UserRepository.ts
-│   │   ├── SessionRepository.ts
-│   │   └── NutritionLogRepository.ts
-│   └── services/
-│       └── PasswordHasher.ts        # Password hashing interface
-├── application/useCases/            # APPLICATION LAYER — Orchestrates domain
-│   ├── RegisterUser.ts              # User registration flow
-│   ├── LoginUser.ts                 # User authentication flow
-│   ├── AddNutritionLog.ts           # Create nutrition entry
-│   └── GetNutritionLogsByDate.ts    # Fetch logs for a date
-├── infrastructure/                  # INFRASTRUCTURE LAYER — Implementations
-│   ├── auth/
-│   │   ├── BcryptPasswordHasher.ts  # Implements PasswordHasher (bcrypt, 10 rounds)
-│   │   ├── cookieConfig.ts          # Session cookie settings (httpOnly, 24h expiry)
-│   │   └── sessionMiddleware.ts     # Express middleware for auth
-│   ├── database/
-│   │   ├── DatabaseClient.ts        # Database interface
-│   │   ├── sqliteConnection.ts      # SQLite implementation
-│   │   └── initializeDatabase.ts    # Creates tables on startup
-│   └── repositories/
-│       ├── SQLiteUserRepository.ts
-│       ├── SQLiteSessionRepository.ts
-│       └── SQLiteNutritionLogRepository.ts
-├── interfaces/http/                 # INTERFACE LAYER — HTTP handlers
-│   ├── routes.ts                    # Route configuration
-│   └── controllers/
-│       ├── AuthController.ts        # /api/users endpoints
-│       └── NutritionController.ts   # /api/nutrition endpoints
-└── types/
-    └── express.d.ts                 # Express type augmentation (adds userId to Request)
+├── main.ts                     # Entry point (Composition Root)
+├── domain/                     # INNERMOST LAYER — Pure business logic
+│   ├── entities/               # User and NutritionLog entities
+│   ├── valueObjects/           # Immutable, self-validating objects (EmailAddress, PlainPassword, HashedPassword, CalorieBudget, NutritionEntry)
+│   ├── repositories/           # Interface definitions (UserRepository, SessionRepository, NutritionLogRepository)
+│   └── services/               # PasswordHasher interface
+├── application/useCases/       # APPLICATION LAYER — 10 use cases orchestrating domain logic
+├── infrastructure/             # INFRASTRUCTURE LAYER — Concrete implementations
+│   ├── auth/                   # BcryptPasswordHasher, cookie config, session middleware
+│   ├── database/               # DatabaseClient interface, SQLite connection, table initialization
+│   └── repositories/           # SQLite implementations of domain repository interfaces
+├── interfaces/http/            # INTERFACE LAYER — HTTP handlers
+│   ├── routes.ts               # Route configuration
+│   └── controllers/            # AuthController and NutritionController
+├── utils/                      # Date formatting utility
+└── types/                      # Express type augmentation (adds userId to Request)
 ```
 
 ### Frontend Structure
 
 ```
 frontend/
-├── index.html                       # HTML entry point
-├── vite.config.ts                   # Vite + React + Tailwind CSS plugin config
+├── index.html                  # HTML entry point
+├── vite.config.ts              # Vite + React + Tailwind CSS plugin config + API proxy
 ├── src/
-│   ├── main.tsx                     # React DOM root
-│   ├── App.tsx                      # Root component
-│   ├── index.css                    # Tailwind CSS imports, DaisyUI plugin, Poppins font
-│   ├── api/                         # API client functions (planned)
-│   ├── hooks/                       # Custom React hooks (planned)
-│   ├── components/
-│   │   ├── NavBar.tsx               # Navigation bar with brand logo and action buttons
-│   │   └── Hero.tsx                 # Landing hero section with CTA
-│   └── pages/
-│       └── Home.tsx                 # Home page (NavBar + Hero)
-└── public/                          # Static assets
+│   ├── main.tsx                # React DOM root with BrowserRouter
+│   ├── App.tsx                 # Route definitions (8 routes)
+│   ├── index.css               # Tailwind CSS imports, DaisyUI plugin, Poppins font
+│   ├── api/                    # 11 fetch wrappers (one per API endpoint, credentials: "include")
+│   ├── hooks/                  # 11 custom React hooks (one per feature: auth, CRUD, theme, etc.)
+│   ├── layouts/                # AuthLayout — session guard wrapper with nav bars
+│   ├── pages/                  # 8 pages (Home, Register, Login, Dashboard, AddEntry, EditEntry, Profile, Settings)
+│   ├── components/             # 18 presentational components (forms, modals, toasts, nav, dashboard UI)
+│   └── utils/                  # Date formatting helpers
+└── public/                     # Static assets
 ```
 
 ### Layer Responsibilities
@@ -119,31 +97,48 @@ frontend/
 
 Dependencies only point **inward** toward the domain layer. The domain layer knows nothing about databases, frameworks, or external libraries.
 
+### Frontend Patterns
+
+| Pattern | Description |
+|---------|-------------|
+| **Smart/Dumb Components** | Pages own state via hooks; components are purely presentational |
+| **Custom Hooks** | One hook per feature encapsulates API calls, form state, and navigation logic |
+| **API Layer** | Thin `fetch` wrappers per endpoint with `credentials: "include"` for cookie auth |
+| **No Global State** | Each page independently fetches what it needs; React Router state carries one-time messages |
+| **Session Guard** | `useSessionGuard` hook redirects based on auth state (protect routes or redirect logged-in users) |
+
 ## API Endpoints
 
 | Method | Endpoint | Description | Auth Required |
 |--------|----------|-------------|---------------|
 | `POST` | `/api/users/register` | Create new user account | No |
-| `POST` | `/api/users/login` | Authenticate and get session | No |
+| `POST` | `/api/users/login` | Authenticate and create session | No |
+| `POST` | `/api/users/logout` | Destroy session and clear cookie | Yes |
+| `GET` | `/api/users/check-session` | Check if session cookie is valid | No |
+| `GET` | `/api/users/me` | Get authenticated user's profile | Yes |
+| `PUT` | `/api/users/me/calorie-budget` | Update daily calorie budget | Yes |
 | `POST` | `/api/nutrition` | Add nutrition entry | Yes |
-| `GET` | `/api/nutrition?date=YYYY-MM-DD` | Get entries for date | Yes |
+| `GET` | `/api/nutrition?date=YYYY-MM-DD` | Get entries for a date | Yes |
+| `GET` | `/api/nutrition/:logId` | Get a specific entry by ID | Yes |
+| `PUT` | `/api/nutrition/:logId` | Update an existing entry | Yes |
+| `DELETE` | `/api/nutrition/:logId` | Delete an entry | Yes |
 
-### Database
+## Database
 
 SQLite database is automatically initialized on first run with the following tables:
 
-| Table | Description |
-|-------|-------------|
-| `users` | User accounts (id, first_name, last_name, email, password_hash, calorie_budget) |
-| `sessions` | Active login sessions (id, user_id, expires_at, data) |
-| `nutrition_logs` | Nutrition entries (id, user_id, calories, description, date) |
+| Table | Columns |
+|-------|---------|
+| `users` | `id`, `first_name`, `last_name`, `email` (unique), `password_hash`, `calorie_budget` |
+| `sessions` | `id`, `user_id` (FK → users), `expires_at`, `data` |
+| `nutrition_logs` | `id`, `user_id` (FK → users), `calories`, `description`, `emoji_icon`, `date` |
 
 ## Key Abstractions
 
 | Interface | Implementation | Purpose |
 |-----------|----------------|---------|
-| `UserRepository` | `SQLiteUserRepository` | User persistence |
-| `SessionRepository` | `SQLiteSessionRepository` | Session management |
-| `NutritionLogRepository` | `SQLiteNutritionLogRepository` | Nutrition data |
-| `PasswordHasher` | `BcryptPasswordHasher` | Password hashing |
-| `DatabaseClient` | `sqliteConnection` | Database operations |
+| `UserRepository` | `SQLiteUserRepository` | User persistence (save, find, update budget) |
+| `SessionRepository` | `SQLiteSessionRepository` | Session lifecycle (create, find, delete, cleanup) |
+| `NutritionLogRepository` | `SQLiteNutritionLogRepository` | Nutrition log CRUD operations |
+| `PasswordHasher` | `BcryptPasswordHasher` | Password hashing and verification |
+| `DatabaseClient` | `sqliteConnection` | Database query execution |

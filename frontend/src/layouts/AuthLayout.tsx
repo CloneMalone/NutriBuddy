@@ -5,6 +5,7 @@ import ErrorToast from "../components/ErrorToast";
 import FullPageSpinner from "../components/FullPageSpinner";
 import { useLogout } from "../hooks/useLogout";
 import { useSessionGuard } from "../hooks/useSessionGuard";
+import { useUserProfile } from "../hooks/useUserProfile";
 
 interface AuthLayoutProps {
     children: ReactNode;
@@ -20,12 +21,18 @@ interface AuthLayoutProps {
 export default function AuthLayout({ children }: AuthLayoutProps) {
     const { checking } = useSessionGuard();           // guard = true (default)
     const { loading, error, clearError, handleLogout } = useLogout();
+    const { user } = useUserProfile();
 
     if (checking) return <FullPageSpinner />;
 
     return (
         <>
-            <AuthNavBar onLogout={handleLogout} logoutLoading={loading} />
+            <AuthNavBar
+                firstInitial={user?.firstName[0] ?? ""}
+                lastInitial={user?.lastName[0] ?? ""}
+                onLogout={handleLogout}
+                logoutLoading={loading}
+            />
             {children}
             <ErrorToast message={error ?? undefined} onDismiss={clearError} />
             <AuthNavDock />

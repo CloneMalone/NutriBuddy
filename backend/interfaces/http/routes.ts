@@ -44,6 +44,9 @@ export function createAuthRoutes(authController: AuthController): Router {
     // GET /api/users/me - Get authenticated user's profile
     router.get("/me", authController.getProfile);
 
+    // PUT /api/users/me/calorie-budget - Update calorie budget
+    router.put("/me/calorie-budget", authController.updateCalorieBudget);
+
     return router;
 }
 
@@ -67,6 +70,9 @@ export function createNutritionRoutes(nutritionController: NutritionController):
 
     // PUT /api/nutrition/:logId - Update an existing log entry
     router.put("/:logId", nutritionController.updateLog);
+
+    // DELETE /api/nutrition/:logId - Delete an existing log entry
+    router.delete("/:logId", nutritionController.deleteLog);
 
     return router;
 }

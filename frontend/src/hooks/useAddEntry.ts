@@ -1,6 +1,7 @@
 import { useCallback, useState, type FormEvent, type ChangeEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import { addNutritionLog } from "../api/addNutritionLogApi";
+import todayDateString from "../utils/todayDateString";
 
 /** Form field names — kept in sync with the input `name` attributes in AddEntryForm. */
 interface AddEntryFormState {
@@ -8,15 +9,6 @@ interface AddEntryFormState {
     description: string;
     calories: string; // kept as string for the input; parsed to number on submit
     date: string;     // YYYY-MM-DD
-}
-
-/** Returns today's date as a YYYY-MM-DD string. Local time */
-function todayDateString(): string {
-    const now = new Date();
-    const year = now.getFullYear();
-    const month = String(now.getMonth() + 1).padStart(2, "0");
-    const day = String(now.getDate()).padStart(2, "0");
-    return `${year}-${month}-${day}`;
 }
 
 const INITIAL_STATE: AddEntryFormState = {

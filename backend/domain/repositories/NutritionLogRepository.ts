@@ -21,4 +21,7 @@ export interface NutritionLogRepository {
 
     // Update an existing nutrition log entry
     update(log: NutritionLog): Promise<void>;
+
+    // Delete a nutrition log entry (scoped by userId for security)
+    delete(userId: string, logId: string): Promise<void>;
 }

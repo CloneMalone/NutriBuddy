@@ -1,14 +1,36 @@
+import { useState } from "react";
 import AuthLayout from "../layouts/AuthLayout";
 import ProfilePageAvatar from "../components/ProfilePageAvatar";
 import ProfilePageData from "../components/ProfilePageData";
+import EditCalorieBudgetModal from "../components/EditCalorieBudgetModal";
+import SuccessToast from "../components/SuccessToast";
+import ErrorToast from "../components/ErrorToast";
 import { useUserProfile } from "../hooks/useUserProfile";
+import { useUpdateCalorieBudget } from "../hooks/useUpdateCalorieBudget";
 
 /**
- * Smart page — fetches the authenticated user's profile and passes
- * the relevant pieces to the presentational child components.
+ * Smart page — fetches the authenticated user's profile and orchestrates
+ * the calorie-budget edit modal, mutation hook, and toast feedback.
  */
 export default function ProfilePage() {
-    const { user, loading } = useUserProfile();
+    const { user, loading, refreshProfile } = useUserProfile();
+    const { submitCalorieBudget, loading: budgetLoading, error: budgetError, clearError } = useUpdateCalorieBudget();
+
+    // Modal open/close state
+    const [isEditBudgetOpen, setIsEditBudgetOpen] = useState(false);
+
+    // Toast message (shown after a successful budget update)
+    const [successMessage, setSuccessMessage] = useState<string | undefined>();
+
+    /** Called when the user submits a new budget from the modal. */
+    async function handleBudgetSubmit(newBudget: number) {
+        const message = await submitCalorieBudget(newBudget);
+        if (message) {
+            setIsEditBudgetOpen(false);
+            setSuccessMessage(message);
+            refreshProfile();
+        }
+    }
 
     return (
         <AuthLayout>
@@ -30,13 +52,30 @@ export default function ProfilePage() {
                     <ProfilePageAvatar
                         firstName={user?.firstName ?? ""}
                         lastName={user?.lastName ?? ""}
+                        firstInitial={user?.firstName[0] ?? ""}
+                        lastInitial={user?.lastName[0] ?? ""}
                     />
                     <ProfilePageData
                         email={user?.email ?? ""}
                         calorieBudget={user?.calorieBudget ?? 0}
+                        onEditBudget={() => setIsEditBudgetOpen(true)}
                     />
                 </section>
             )}
+
+            {/* Edit calorie budget modal — key forces remount so input resets after save */}
+            <EditCalorieBudgetModal
+                key={user?.calorieBudget}
+                isOpen={isEditBudgetOpen}
+                currentBudget={user?.calorieBudget ?? 0}
+                loading={budgetLoading}
+                onSubmit={handleBudgetSubmit}
+                onCancel={() => setIsEditBudgetOpen(false)}
+            />
+
+            {/* Toasts */}
+            <SuccessToast message={successMessage} onDismiss={() => setSuccessMessage(undefined)} />
+            <ErrorToast message={budgetError} onDismiss={clearError} />
         </AuthLayout>
     );
 }

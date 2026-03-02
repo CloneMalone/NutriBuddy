@@ -101,4 +101,18 @@ export class SQLiteNutritionLogRepository implements NutritionLogRepository {
 			[log.nutritionEntry.calories, log.nutritionEntry.description, log.nutritionEntry.emojiIcon, log.date, log.id, log.userId]
 		);
 	}
+
+	/**
+	 * Delete a nutrition log entry from the database.
+	 * Scoped by both user_id and id for security.
+	 *
+	 * @param userId - The user who owns the log
+	 * @param logId  - The ID of the log to delete
+	 */
+	async delete(userId: string, logId: string): Promise<void> {
+		await this.db.run(
+			`DELETE FROM nutrition_logs WHERE id = ? AND user_id = ?`,
+			[logId, userId]
+		);
+	}
 }

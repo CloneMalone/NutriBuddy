@@ -51,6 +51,8 @@ import { GetUserProfile } from "./application/useCases/GetUserProfile";
 import { CheckSession } from "./application/useCases/CheckSession";
 import { GetNutritionLogById } from "./application/useCases/GetNutritionLogById";
 import { UpdateNutritionLog } from "./application/useCases/UpdateNutritionLog";
+import { DeleteNutritionLog } from "./application/useCases/DeleteNutritionLog";
+import { UpdateCalorieBudget } from "./application/useCases/UpdateCalorieBudget";
 
 // ============================================================================
 // IMPORTS - Interface Layer (Controllers & Routes)
@@ -95,6 +97,8 @@ async function bootstrap() {
     const getNutritionLogsByDate = new GetNutritionLogsByDate(nutritionLogRepository);
     const getNutritionLogById = new GetNutritionLogById(nutritionLogRepository);
     const updateNutritionLog = new UpdateNutritionLog(nutritionLogRepository);
+    const deleteNutritionLog = new DeleteNutritionLog(nutritionLogRepository);
+    const updateCalorieBudget = new UpdateCalorieBudget(userRepository);
 
     // ------------------------------------------------------------------------
     // Step 4: Create Interface Layer (Controllers)
@@ -106,6 +110,7 @@ async function bootstrap() {
         loginUser,
         getUserProfile,
         checkSession,
+        updateCalorieBudget,
         sessionRepository,
         SESSION_COOKIE_NAME,
         sessionCookieOptions
@@ -115,7 +120,8 @@ async function bootstrap() {
         addNutritionLog, 
         getNutritionLogsByDate,
         getNutritionLogById,
-        updateNutritionLog
+        updateNutritionLog,
+        deleteNutritionLog
     );
 
     // ------------------------------------------------------------------------

@@ -19,6 +19,7 @@ import { RegisterUser } from "../../../application/useCases/RegisterUser";
 import { LoginUser } from "../../../application/useCases/LoginUser";
 import { GetUserProfile } from "../../../application/useCases/GetUserProfile";
 import { CheckSession } from "../../../application/useCases/CheckSession";
+import { UpdateCalorieBudget } from "../../../application/useCases/UpdateCalorieBudget";
 
 // Import crypto for generating UUIDs
 import { randomUUID } from "crypto";
@@ -42,6 +43,9 @@ export class AuthController {
 
         // Use case for checking if a session is still valid
         private readonly checkSessionUseCase: CheckSession,
+
+        // Use case for updating the user's calorie budget
+        private readonly updateCalorieBudgetUseCase: UpdateCalorieBudget,
         
         // Repository for creating sessions after successful login
         private readonly sessionRepository: SessionRepository,
@@ -220,6 +224,35 @@ export class AuthController {
 
             return res.status(200).json({ message: "Logged out successfully" });
         } catch (error) {
+            console.error(error);
+            return res.status(500).json({ error: "Internal server error" });
+        }
+    };
+
+    /**
+     * Handle PUT /api/users/me/calorie-budget
+     *
+     * Updates the authenticated user's daily calorie budget.
+     */
+    updateCalorieBudget = async (req: Request, res: Response) => {
+        try {
+            const userId = (req as any).userId as string | undefined;
+
+            if (!userId) {
+                return res.status(401).json({ error: "Not authenticated" });
+            }
+
+            const { calorieBudget } = req.body;
+
+            // Call the use case to validate and persist the new budget
+            const message = await this.updateCalorieBudgetUseCase.execute(userId, calorieBudget);
+
+            return res.status(200).json({ message });
+        } catch (error) {
+            if (error instanceof DomainError) {
+                return res.status(400).json({ error: error.message });
+            }
+
             console.error(error);
             return res.status(500).json({ error: "Internal server error" });
         }
