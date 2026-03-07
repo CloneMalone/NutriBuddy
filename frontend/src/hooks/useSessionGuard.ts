@@ -8,7 +8,7 @@ import { checkSession } from "../api/checkSessionApi";
  * - **guard = true** (default): Redirects to /login if the session is invalid.
  *   Use this in authenticated pages (via AuthLayout).
  * - **guard = false**: Redirects to /dashboard if the session IS valid.
- *   Use this in public pages like Login/Register so logged-in users skip them.
+ *   Use this in public pages like Login so logged-in users skip them.
  *
  * Returns `checking` — true while the session check is in-flight, so the
  * page can show a FullPageSpinner instead of flashing content.

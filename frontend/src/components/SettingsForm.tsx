@@ -1,6 +1,6 @@
 import type { ChangeEvent } from "react";
 
-/** All 32 built-in DaisyUI themes in the order they appear in the docs. */
+/** All 35 built-in DaisyUI themes in the order they appear in the docs. */
 const DAISY_THEMES = [
     "light", "dark", "cupcake", "bumblebee", "emerald", "corporate",
     "synthwave", "retro", "cyberpunk", "valentine", "halloween", "garden",
